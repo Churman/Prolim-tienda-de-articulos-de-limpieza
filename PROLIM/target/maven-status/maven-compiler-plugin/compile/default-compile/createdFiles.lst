@@ -1,0 +1,9 @@
+com\mycompany\prolim\vistas\VentanaGestionProveedor.class
+com\mycompany\prolim\vistas\MenuPrincipalProlim.class
+com\mycompany\prolim\controladores\ControladorGestionProducto.class
+com\mycompany\prolim\modelos\Producto.class
+com\mycompany\prolim\vistas\VentanaGestionProducto.class
+com\mycompany\prolim\controladores\ControladorGestionProveedor.class
+com\mycompany\prolim\modelos\Proveedor.class
+com\mycompany\prolim\modelos\ProveedoresAlternativos.class
+com\mycompany\prolim\PROLIM.class
