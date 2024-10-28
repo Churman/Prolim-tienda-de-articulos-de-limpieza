@@ -58,15 +58,15 @@ public class VentanaGestionProveedor {
                      solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea modificar", sc));
 
                     if(posicionBuscado != -1 ){
-                        // Solicita confirmación antes de modificar
-                        if (solicitarConfirmacionOperacion(sc).equals("si"))
-                            controlador.modificarInformacionProveedor(new Proveedor
+                        Proveedor proveedorModificado = new Proveedor
                         (solicitarNombrePantalla("Ingrese el nuevo nombre del proveedor.", sc), 
                          solicitarApellidoPantalla("Ingrese el nuevo apellido del proveedor.", sc), 
                          solicitarTelefonoPantalla(sc), 
                          solicitarMailPantalla(sc), 
-                         solicitarProductoPantalla(sc)), 
-                         posicionBuscado);                     
+                         solicitarProductoPantalla(sc));
+                        // Solicita confirmación antes de modificar
+                        if (solicitarConfirmacionOperacion(sc).equals("si"))
+                            controlador.modificarInformacionProveedor(proveedorModificado, posicionBuscado);                     
                         else
                             System.out.println("Operación cancelada.");
                     }
