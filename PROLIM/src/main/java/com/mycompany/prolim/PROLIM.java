@@ -1,21 +1,16 @@
 package com.mycompany.prolim;
 
 import com.mycompany.prolim.vistas.MenuPrincipalProlim;
-import java.util.Scanner;
+import java.sql.SQLException;
 
 public class PROLIM {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         
         // Crea una instancia del menú principal
         MenuPrincipalProlim menuPrincipal = new MenuPrincipalProlim();
         
-        // Crea un objeto Scanner para capturar la entrada del usuario
-        Scanner sc = new Scanner(System.in);
-        
         // Llama al método del menú principal para mostrar las opciones
-        menuPrincipal.menu(sc);
+        menuPrincipal.menu();
         
-        // Cierra el scanner para liberar recursos
-        sc.close();
     }
 }

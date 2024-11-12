@@ -11,4 +11,15 @@
         <maven.compiler.target>21</maven.compiler.target>
         <exec.mainClass>com.mycompany.prolim.PROLIM</exec.mainClass>
     </properties>
+    
+        <!-- Sección de dependencias -->
+    <dependencies>
+        <!-- MySQL Connector/J dependency -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version> <!-- Asegúrate de usar la última versión disponible -->
+        </dependency>
+    </dependencies>
+    
 </project>

@@ -1,22 +1,25 @@
 package com.mycompany.prolim.vistas;
 
-import com.mycompany.prolim.modelos.Proveedor;
+import com.mycompany.prolim.Proveedor;
 import com.mycompany.prolim.controladores.ControladorGestionProveedor;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class VentanaGestionProveedor {
     
     // Controlador para gestionar la lógica relacionada con los proveedores
-    private ControladorGestionProveedor controlador;
+    private final ControladorGestionProveedor controlador;
+    private final Scanner sc;
     
     // Constructor de la clase VentanaGestionProveedor
-    public VentanaGestionProveedor (){
+    public VentanaGestionProveedor (Scanner sc){
+        this.sc = sc; 
         // Inicializa el controlador y pasa la referencia de esta vista
         this.controlador = new ControladorGestionProveedor(this);
     }
     
     // Método que muestra el menú de gestión de proveedores
-    public void menu(Scanner sc){
+    public void menu() throws SQLException {
         boolean salir = true; // Variable para controlar el bucle del menú
         int opciones; // Variable para almacenar la opción seleccionada por el usuario
         do{
@@ -29,6 +32,7 @@ public class VentanaGestionProveedor {
             System.out.println("5- Registrar nuevo proveedor alternativo.");
             System.out.println("6- Eliminar proveedor alternativo.");
             System.out.println("7- Sugerir proveedores alternativos.");
+            System.out.println("8- Listar todos los proveedores.");
             System.out.println("0- Volver al menu.");
 
             // Verifica que la opción ingresada sea un entero
@@ -39,90 +43,82 @@ public class VentanaGestionProveedor {
             }
 
             opciones = sc.nextInt(); // Captura la opción seleccionada
+            sc.nextLine();
 
             // Maneja la opción seleccionada
             switch(opciones){
                 case 1 ->{
                     // Registra un nuevo proveedor
                     controlador.registrarInformacionProveedor
-                    (solicitarNombrePantalla("Ingrese el nombre del proveedor.", sc), 
-                     solicitarApellidoPantalla("Ingrese el apellido del proveedor.", sc), 
-                     solicitarTelefonoPantalla(sc), 
-                     solicitarMailPantalla(sc), 
-                     solicitarProductoPantalla(sc));
+                    (solicitarNombrePantalla("Ingrese el nombre del proveedor."), 
+                     solicitarApellidoPantalla("Ingrese el apellido del proveedor."), 
+                     solicitarTelefonoPantalla(), 
+                     solicitarMailPantalla(), 
+                     solicitarProductoPantalla("Ingrese el producto que entrega el proveedor."));
                 }
                 case 2 ->{
                     // Modifica la información de un proveedor existente
-                    int posicionBuscado = controlador.buscarProveedorPorNombreCompleto
-                    (solicitarNombrePantalla("Ingrese el nombre del proveedor que desea modificar.", sc), 
-                     solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea modificar", sc));
+                    Proveedor proveedorBuscado = controlador.buscarProveedorPorNombreCompleto
+                    (solicitarNombrePantalla("Ingrese el nombre del proveedor que desea modificar."), 
+                     solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea modificar"));
 
-                    if(posicionBuscado != -1 ){
+                    if(proveedorBuscado != null ){
                         Proveedor proveedorModificado = new Proveedor
-                        (solicitarNombrePantalla("Ingrese el nuevo nombre del proveedor.", sc), 
-                         solicitarApellidoPantalla("Ingrese el nuevo apellido del proveedor.", sc), 
-                         solicitarTelefonoPantalla(sc), 
-                         solicitarMailPantalla(sc), 
-                         solicitarProductoPantalla(sc));
+                        (solicitarNombrePantalla("Ingrese el nuevo nombre del proveedor."), 
+                         solicitarApellidoPantalla("Ingrese el nuevo apellido del proveedor."), 
+                         solicitarTelefonoPantalla(), 
+                         solicitarMailPantalla());
                         // Solicita confirmación antes de modificar
-                        if (solicitarConfirmacionOperacion(sc).equals("si"))
-                            controlador.modificarInformacionProveedor(proveedorModificado, posicionBuscado);                     
+                        if (solicitarConfirmacionOperacion().equals("si"))
+                            controlador.modificarInformacionProveedor(proveedorModificado, proveedorBuscado);                     
                         else
                             System.out.println("Operación cancelada.");
-                    }
-                    else
+                    } else
                         System.out.println("No existe el proveedor que desea modificar.");
                 }
                 case 3 ->{
                     // Busca un proveedor por su nombre completo
-                    int posicionBuscado = controlador.buscarProveedorPorNombreCompleto
-                    (solicitarNombrePantalla("Ingrese el nombre del proveedor que desea buscar.", sc), 
-                     solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea buscar", sc));
-                    if(posicionBuscado != -1)
-                        controlador.mostrarCoincidencia(posicionBuscado);
+                    Proveedor proveedorBuscado = controlador.buscarProveedorPorNombreCompleto
+                    (solicitarNombrePantalla("Ingrese el nombre del proveedor que desea buscar."), 
+                     solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea buscar"));
+                    if(proveedorBuscado != null)
+                        controlador.mostrarCoincidencia(proveedorBuscado);
                     else
                         System.out.println("No existe el proveedor ingresado.");
                 }
                 case 4 ->{
                     // Elimina un proveedor
-                    int posicionBuscado = controlador.buscarProveedorPorNombreCompleto
-                    (solicitarNombrePantalla("Ingrese el nombre del proveedor que desea eliminar.", sc), 
-                     solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea eliminar", sc));    
-                    if(posicionBuscado != -1 )
-                        controlador.eliminarProveedor(posicionBuscado);
+                    Proveedor proveedorBuscado = controlador.buscarProveedorPorNombreCompleto
+                    (solicitarNombrePantalla("Ingrese el nombre del proveedor que desea eliminar."), 
+                     solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea eliminar"));    
+                    if(proveedorBuscado != null )
+                        // Solicita confirmación antes de realizar la eliminación
+                        if (solicitarConfirmacionOperacion().equals("si")) {
+                            controlador.eliminarProveedor(proveedorBuscado);
+                        } else {
+                            System.out.println("Operación cancelada.");
+                        }
                     else
                         System.out.println("No existe el proveedor que desea eliminar.");
                 }
                 case 5 ->{
                     // Registra un nuevo proveedor alternativo
-                    Proveedor proveedorARegistrar = new Proveedor 
-                    (solicitarNombrePantalla("Ingrese el nombre del proveedor.", sc), 
-                     solicitarApellidoPantalla("Ingrese el apellido del proveedor.", sc), 
-                     solicitarTelefonoPantalla(sc), 
-                     solicitarMailPantalla(sc), 
-                     solicitarProductoPantalla(sc));
-                    controlador.registrarProveedorAlternativo(proveedorARegistrar);
+                    controlador.registrarProveedorAlternativo(solicitarNombrePantalla("Ingrese el nombre del proveedor."), 
+                     solicitarApellidoPantalla("Ingrese el apellido del proveedor."), 
+                     solicitarProductoPantalla("Ingrese el producto que entrega el proveedor."));
                 }
                 case 6 ->{
                     // Elimina un proveedor alternativo
-                    int posicionBuscado = controlador.buscarProveedorAlternativoSegunProducto(solicitarProductoPantalla(sc));
-                    if(posicionBuscado != -1 )
-                        controlador.eliminarProveedorAlternativo(posicionBuscado, 
-                        solicitarNombrePantalla("Ingrese el nombre del proveedor que desea eliminar.", sc), 
-                        solicitarApellidoPantalla("Ingrese el apellido del proveedor que desea eliminar", sc));
-                    else
-                        System.out.println("No existe el producto ingresado para eliminar el proveedor alternativo.");
+                    controlador.eliminarProveedorAlternativo(solicitarNombrePantalla("Ingrese el nombre del proveedor alternativo que desea eliminar."), 
+                        solicitarApellidoPantalla("Ingrese el apellido del proveedor alternativo que desea eliminar"),
+                        solicitarProductoPantalla("Ingrese el producto que entregaba el proveedor."));
                 }
                 case 7 ->{
                     // Sugiere proveedores alternativos basados en un producto
-                    System.out.println("Ingrese el nombre del producto de los proveedores alternativos.");
-                    int posicionProducto = controlador.buscarProveedorAlternativoSegunProducto(sc.next());
-                    if(posicionProducto == -1)
-                        System.out.println("No existen el producto ingresado para mostrar los proveedores alternativos.");
-                    else if(controlador.verificarListaAlternativaVaciaPorProducto(posicionProducto))
-                        System.out.println("No existen proveedores encargados de ese producto");
-                    else
-                        controlador.mostrarInformacion(posicionProducto);
+                    controlador.mostrarProveedoresPorProducto(solicitarProductoPantalla("Ingrese el nombre del producto de los prveedores alternativos."));   
+                }
+                case 8 ->{
+                    controlador.listarProveedores();
                 }
                 case 0 ->{
                     // Sale del menú
@@ -137,45 +133,45 @@ public class VentanaGestionProveedor {
     }
     
     // Muestra un mensaje de confirmación de operación
-    public void mostrarConfirmacionOperacion (boolean operacionExitosa){
+    public void mostrarConfirmacionOperacion (boolean operacionExitosa, String fallo){
         if(operacionExitosa)
             System.out.println("Operación realizada exitosamente!");
         else
-            System.out.println("Operación fallida.");
+            System.out.println("Operación fallida. " + fallo);
     }
     
     // Solicita el nombre al usuario y lo devuelve
-    private String solicitarNombrePantalla(String mensaje, Scanner sc){
+    public String solicitarNombrePantalla(String mensaje){
         System.out.println(mensaje);
-        return sc.next(); // Captura y devuelve el nombre
+        return sc.nextLine(); // Captura y devuelve el nombre
     }
     
     // Solicita el apellido al usuario y lo devuelve
-    private String solicitarApellidoPantalla(String mensaje, Scanner sc){
+    public String solicitarApellidoPantalla(String mensaje){
         System.out.println(mensaje);
-        return sc.next(); // Captura y devuelve el apellido
+        return sc.nextLine(); // Captura y devuelve el apellido
     }
     
     // Solicita el número de teléfono al usuario y lo devuelve
-    private String solicitarTelefonoPantalla(Scanner sc){
+    public String solicitarTelefonoPantalla(){
         System.out.println("Ingrese el número de telefono del proveedor.");
-        return sc.next(); // Captura y devuelve el teléfono
+        return sc.nextLine(); // Captura y devuelve el teléfono
     }
     
     // Solicita el correo electrónico al usuario y lo devuelve
-    private String solicitarMailPantalla(Scanner sc){
+    public String solicitarMailPantalla(){
         System.out.println("Ingrese la dirección de correo electrónico del proveedor.");
-        return sc.next(); // Captura y devuelve el correo electrónico
+        return sc.nextLine(); // Captura y devuelve el correo electrónico
     }
     
     // Solicita el producto que entrega el proveedor y lo devuelve
-    private String solicitarProductoPantalla(Scanner sc) {
-        System.out.println("Ingrese el producto que entrega el proveedor.");
-        return sc.next(); // Captura y devuelve el producto
+    public String solicitarProductoPantalla(String mensaje) {
+        System.out.println(mensaje);
+        return sc.nextLine(); // Captura y devuelve el producto
     }
     
     // Solicita confirmación de operación y devuelve la respuesta
-    private String solicitarConfirmacionOperacion(Scanner sc){
+    public String solicitarConfirmacionOperacion(){
         System.out.println("¿Ésta seguro que desea realizar los cambios? si/no");
         String respuesta = sc.next(); // Captura la respuesta
         while (!respuesta.equals("si") && !respuesta.equals("no")){
