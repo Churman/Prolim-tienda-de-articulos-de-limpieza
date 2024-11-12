@@ -1,0 +1,132 @@
+CREATE DATABASE PROLIM;
+
+USE PROLIM;
+
+-- CREACION DE TABLAS.
+
+CREATE TABLE Producto (
+    id_producto int PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    nombre VARCHAR (50) NOT NULL,
+    categoria VARCHAR (50) NOT NULL,
+    precio float NOT NULL
+);
+
+CREATE TABLE Proveedor (
+    id_proveedor int PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    nombre VARCHAR (50) NOT NULL,
+    apellido VARCHAR (50) NOT NULL,
+    telefono int NOT NULL,
+    mail VARCHAR (50) NOT NULL
+);
+
+CREATE TABLE Proveedor_producto (
+    id_proveedor int NOT NULL,
+    id_producto int NOT NULL,
+    FOREIGN KEY (id_proveedor) REFERENCES Proveedor (id_proveedor),
+	FOREIGN KEY (id_producto) REFERENCES Producto (id_producto)
+);
+
+CREATE TABLE Pedido (
+    id_pedido int PRIMARY KEY NOT NULL,
+    id_proveedor int NOT NULL,
+    fecha_pedido date NOT NULL,
+    estado VARCHAR (50) NOT NULL,
+    FOREIGN KEY (id_proveedor) REFERENCES Proveedor (id_proveedor)
+);
+
+CREATE TABLE DetallesPedidos (
+    id_detalle_pedidos int PRIMARY KEY NOT NULL,
+    id_pedido int NOT NULL,
+    id_producto int NOT NULL,
+    cantidad int NOT NULL,
+    FOREIGN KEY (id_pedido) REFERENCES Pedido (id_pedido),
+    FOREIGN KEY (id_producto) REFERENCES Producto (id_producto)
+);
+
+CREATE TABLE Stock(
+	id_stock int PRIMARY KEY NOT NULL,
+    id_producto int NOT NULL,
+    cantidadActual int NOT NULL,
+    cantidadMinima int NOT NULL,
+    cantidadMaxima int NOT NULL,
+    fechaUltimaEntrada date,
+    fechaUltimaSalida date,
+	FOREIGN KEY (id_producto) REFERENCES Producto (id_producto)
+);
+
+-- Inserción de datos.
+
+INSERT INTO proveedor (id_proveedor, nombre, apellido, telefono, mail) VALUES ('1','Sebastian','Lopez','423018','seba.27@gmail.com');
+INSERT INTO proveedor (id_proveedor, nombre, apellido, telefono, mail) VALUES ('2','Camila','Diaz','427893','camirodriguez@hotmail.com');
+INSERT INTO proveedor (id_proveedor, nombre, apellido, telefono, mail) VALUES ('3','Jorge','Morel','420950','jorge.97@gmail.com');
+
+INSERT INTO producto (id_producto, nombre, categoria, precio, stock_actual) VALUES ('1','Ala jabon en polvo Matic con Vivere x 800 grs','Limpieza','1900','15');
+INSERT INTO producto (id_producto, nombre, categoria, precio, stock_actual) VALUES ('2','Argentum secador piso goma negra 30 cm','Limpieza','1450','30');
+INSERT INTO producto (id_producto, nombre, categoria, precio, stock_actual) VALUES ('3','Bandeja sanitizante blanca 60x40 cm','Plasticos y Bazar','9090','10');
+INSERT INTO producto (id_producto, nombre, categoria, precio, stock_actual) VALUES ('4','Balde 13 lts manija metal','Plasticos y Bazar','3700','10');
+INSERT INTO producto (id_producto, nombre, categoria, precio, stock_actual) VALUES ('5','Bolsa Consorcio 60x90 x50 UN.','Papeleria y Bolsas','4200','20');
+
+INSERT INTO proveedor_producto (id_proveedor, id_producto) VALUES ('1','1');
+INSERT INTO proveedor_producto (id_proveedor, id_producto) VALUES ('1','2');
+INSERT INTO proveedor_producto (id_proveedor, id_producto) VALUES ('2','3');
+INSERT INTO proveedor_producto (id_proveedor, id_producto) VALUES ('2','4');
+INSERT INTO proveedor_producto (id_proveedor, id_producto) VALUES ('3','5');
+
+INSERT INTO pedido (id_pedido, id_proveedor, fecha_pedido, estado) VALUES ('1','1','2024-02-20','Entregado');
+INSERT INTO pedido (id_pedido, id_proveedor, fecha_pedido, estado) VALUES ('2','1','2024-03-19','Entregado');
+INSERT INTO pedido (id_pedido, id_proveedor, fecha_pedido, estado) VALUES ('3','2','2024-04-07','Entregado');
+INSERT INTO pedido (id_pedido, id_proveedor, fecha_pedido, estado) VALUES ('4','2','2024-05-15','Pendiente');
+INSERT INTO pedido (id_pedido, id_proveedor, fecha_pedido, estado) VALUES ('5','3','2023-05-28','Pendiente');
+
+INSERT INTO detallespedidos (id_detalle_pedidos, id_pedido, id_producto, cantidad) VALUES ('1','1','3','10');
+INSERT INTO detallespedidos (id_detalle_pedidos, id_pedido, id_producto, cantidad) VALUES ('2','2','1','15');
+INSERT INTO detallespedidos (id_detalle_pedidos, id_pedido, id_producto, cantidad) VALUES ('3','3','4','10');
+INSERT INTO detallespedidos (id_detalle_pedidos, id_pedido, id_producto, cantidad) VALUES ('4','4','5','5');
+INSERT INTO detallespedidos (id_detalle_pedidos, id_pedido, id_producto, cantidad) VALUES ('5','5','2','10');
+
+-- Consutlas.
+
+SELECT 
+    ped.id_pedido AS Numero_Pedido,
+    prod.nombre AS Nombre_Producto,
+    prod.categoria AS Categoria,
+    dp.cantidad AS Cantidad_Pedida,
+    (dp.cantidad * prod.precio) AS Costo_Total,
+    ped.estado AS Estado_Pedido
+FROM pedido ped
+JOIN 
+    detallespedidos dp ON ped.id_pedido = dp.id_pedido
+JOIN 
+    producto prod ON dp.id_producto = prod.id_producto
+WHERE 
+    ped.id_pedido = 4;
+
+SELECT 
+    prod.nombre AS Nombre_Producto,
+    prod.stock_actual AS Stock_Actual,
+    prov.nombre AS Nombre_Proveedor,
+    prov.apellido AS Apellido_Proveedor,
+    prov.telefono AS Telefono_Proveedor
+FROM 
+    producto prod
+JOIN 
+    proveedor_producto pp ON prod.id_producto = pp.id_producto
+JOIN 
+    proveedor prov ON pp.id_proveedor = prov.id_proveedor
+WHERE 
+    prod.id_producto = 2;
+    
+SELECT
+	prod.*
+FROM
+	producto prod
+WHERE
+	prod.categoria = 'Limpieza';
+
+-- Borrado de datos.
+
+DELETE FROM DetallesPedidos;
+DELETE FROM Pedido;
+DELETE FROM Proveedor_producto;
+DELETE FROM Proveedor;
+DELETE FROM Producto;
